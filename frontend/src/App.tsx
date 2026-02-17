@@ -1,0 +1,147 @@
+import { useState, useEffect, useCallback, useRef } from 'react'
+import Layout from './components/Layout'
+import Dashboard from './components/Dashboard'
+import MutuoForm from './components/MutuoForm'
+import MutuoDetail from './components/MutuoDetail'
+import ComparisonView from './components/ComparisonView'
+import AdvisorChat from './components/AdvisorChat'
+import PrintReport from './components/PrintReport'
+import { api } from './api/client'
+import type { Mutuo, MutuoForm as MutuoFormType, ViewMode, AdvisorStatus } from './types'
+
+export default function App() {
+  const [view, setView] = useState<ViewMode>('dashboard')
+  const [mutui, setMutui] = useState<Mutuo[]>([])
+  const [selectedIds, setSelectedIds] = useState<number[]>([])
+  const [detailId, setDetailId] = useState<number | null>(null)
+  const [advisorStatus, setAdvisorStatus] = useState<AdvisorStatus | null>(null)
+  const [formLoading, setFormLoading] = useState(false)
+  const [eurirs30y, setEurirs30y] = useState<number | null>(null)
+  const printRef = useRef<HTMLDivElement>(null)
+
+  const handlePrint = () => {
+    window.print()
+  }
+
+  const loadMutui = useCallback(async () => {
+    try {
+      const data = await api.listaMutui()
+      setMutui(data)
+    } catch {
+      // handled by empty state
+    }
+  }, [])
+
+  const checkAdvisor = useCallback(async () => {
+    try {
+      const status = await api.statoAdvisor()
+      setAdvisorStatus(status)
+    } catch {
+      setAdvisorStatus({ ollama_online: false, modello_disponibile: false, modello: 'gemma2:2b', modelli_installati: [] })
+    }
+  }, [])
+
+  const loadEurirs = useCallback(async () => {
+    try {
+      const data = await api.getEurirs()
+      setEurirs30y(data.eurirs_30y)
+    } catch {
+      // ignore
+    }
+  }, [])
+
+  async function handleSaveEurirs(value: number) {
+    try {
+      await api.setEurirs(value)
+      setEurirs30y(value)
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Errore nel salvataggio')
+    }
+  }
+
+  useEffect(() => {
+    loadMutui()
+    checkAdvisor()
+    loadEurirs()
+  }, [loadMutui, checkAdvisor, loadEurirs])
+
+  async function handleCreateMutuo(data: MutuoFormType) {
+    setFormLoading(true)
+    try {
+      await api.creaMutuo(data)
+      await loadMutui()
+      setView('dashboard')
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Errore nel salvataggio')
+      throw e
+    } finally {
+      setFormLoading(false)
+    }
+  }
+
+  async function handleDeleteMutuo(id: number) {
+    if (!confirm('Eliminare questo mutuo?')) return
+    try {
+      await api.eliminaMutuo(id)
+      setSelectedIds(prev => prev.filter(i => i !== id))
+      await loadMutui()
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Errore nella cancellazione')
+    }
+  }
+
+  function handleToggleSelect(id: number) {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    )
+  }
+
+  function handleViewDetail(id: number) {
+    setDetailId(id)
+    setView('dettaglio')
+  }
+
+  function handleNavigate(newView: ViewMode) {
+    setView(newView)
+    if (newView !== 'dettaglio') setDetailId(null)
+  }
+
+  return (
+    <div className="print-wrapper">
+    <Layout currentView={view} onNavigate={handleNavigate} advisorStatus={advisorStatus}>
+      {view === 'dashboard' && (
+        <Dashboard
+          mutui={mutui}
+          onView={handleViewDetail}
+          onDelete={handleDeleteMutuo}
+          selectedIds={selectedIds}
+          onToggleSelect={handleToggleSelect}
+          onPrint={handlePrint}
+          eurirs30y={eurirs30y}
+          onSaveEurirs={handleSaveEurirs}
+        />
+      )}
+      {view === 'nuovo' && (
+        <MutuoForm onSubmit={handleCreateMutuo} loading={formLoading} />
+      )}
+      {view === 'confronto' && (
+        <ComparisonView selectedIds={selectedIds} mutui={mutui} />
+      )}
+      {view === 'advisor' && (
+        <AdvisorChat
+          mutui={mutui}
+          selectedIds={selectedIds}
+          advisorStatus={advisorStatus}
+        />
+      )}
+      {view === 'dettaglio' && detailId && (
+        <MutuoDetail
+          mutuoId={detailId}
+          onBack={() => handleNavigate('dashboard')}
+        />
+      )}
+    </Layout>
+    <PrintReport ref={printRef} mutui={mutui} />
+    </div>
+  )
+}
