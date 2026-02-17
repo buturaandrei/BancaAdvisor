@@ -1,11 +1,14 @@
 node_modules/
 dist/
-*.db
 __pycache__/
 *.pyc
+*.db
 .env
 .venv/
+.git/
 backend/certs/
+backend/serve.py
+backend/generate_certs.py
 backend/serve.log
-frontend/public/ca.pem
-frontend/dist/ca.pem
+start.bat
+*.pem

@@ -111,29 +111,29 @@ export default function ComparisonView({ selectedIds, mutui }: Props) {
         {result.classifica.map((c, i) => (
           <div
             key={c.id}
-            className={`card p-5 ${i === 0 ? 'ring-2 ring-amber-400 border-amber-200' : ''}`}
+            className={`card p-3 sm:p-5 ${i === 0 ? 'ring-2 ring-amber-400 border-amber-200' : ''}`}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold ${
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-lg font-bold flex-shrink-0 ${
                   i === 0 ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'
                 }`}>
-                  {i === 0 ? <Trophy size={20} /> : i + 1}
+                  {i === 0 ? <Trophy size={18} /> : i + 1}
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">{c.banca}</h3>
-                  <div className="flex gap-4 text-sm text-gray-500">
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{c.banca}</h3>
+                  <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-0.5 text-xs sm:text-sm text-gray-500">
                     <span>Rata: <strong className="text-gray-700">{formatCurrency(c.rata_mensile)}</strong></span>
                     <span>TAN: <strong className="text-gray-700">{formatPercent(c.tan)}</strong></span>
-                    <span>Costo totale: <strong className="text-gray-700">{formatCurrency(c.costo_totale)}</strong></span>
+                    <span className="hidden sm:inline">Costo: <strong className="text-gray-700">{formatCurrency(c.costo_totale)}</strong></span>
                   </div>
                 </div>
               </div>
-              <div className={`px-4 py-2 rounded-xl ${punteggioBgColor(c.punteggio)}`}>
-                <span className={`text-2xl font-bold ${punteggioColor(c.punteggio)}`}>
+              <div className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex-shrink-0 ${punteggioBgColor(c.punteggio)}`}>
+                <span className={`text-xl sm:text-2xl font-bold ${punteggioColor(c.punteggio)}`}>
                   {c.punteggio}
                 </span>
-                <span className="text-xs text-gray-500 ml-1">/100</span>
+                <span className="text-[10px] sm:text-xs text-gray-500 ml-1">/100</span>
               </div>
             </div>
           </div>
@@ -141,7 +141,7 @@ export default function ComparisonView({ selectedIds, mutui }: Props) {
       </div>
 
       {/* Analysis */}
-      <div className="card p-6">
+      <div className="card p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles size={16} className="text-primary-600" />
           <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Analisi</h3>
@@ -151,9 +151,9 @@ export default function ComparisonView({ selectedIds, mutui }: Props) {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="card p-6">
+        <div className="card p-4 sm:p-6">
           <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-4">Radar Comparativo</h3>
-          <ResponsiveContainer width="100%" height={320}>
+          <ResponsiveContainer width="100%" height={260}>
             <RadarChart data={radarData}>
               <PolarGrid stroke="#e5e7eb" />
               <PolarAngleAxis dataKey="metrica" tick={{ fontSize: 11 }} />
@@ -173,13 +173,13 @@ export default function ComparisonView({ selectedIds, mutui }: Props) {
           </ResponsiveContainer>
         </div>
 
-        <div className="card p-6">
+        <div className="card p-4 sm:p-6">
           <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-4">Rata Mensile</h3>
-          <ResponsiveContainer width="100%" height={320}>
+          <ResponsiveContainer width="100%" height={260}>
             <BarChart data={rateData} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis type="number" tickFormatter={(v) => `\u20ac${v}`} tick={{ fontSize: 12 }} />
-              <YAxis type="category" dataKey="banca" tick={{ fontSize: 12 }} width={120} />
+              <YAxis type="category" dataKey="banca" tick={{ fontSize: 11 }} width={80} />
               <Tooltip formatter={(value: number) => [formatCurrency(value), 'Rata']} />
               <Bar dataKey="rata" fill="#4c6ef5" radius={[0, 4, 4, 0]} />
             </BarChart>
@@ -188,9 +188,9 @@ export default function ComparisonView({ selectedIds, mutui }: Props) {
       </div>
 
       {/* Cost Breakdown */}
-      <div className="card p-6">
+      <div className="card p-4 sm:p-6">
         <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-4">Composizione Costi</h3>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={260}>
           <BarChart data={costoData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis dataKey="banca" tick={{ fontSize: 12 }} />

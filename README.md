@@ -107,3 +107,7 @@ Il punteggio (0-100) considera:
 - **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, Recharts, Lucide Icons
 - **AI**: Ollama + Gemma 2B
 - **Database**: SQLite (WAL mode)
+
+## Avvio Rapido su Windows
+
+Per avviare rapidamente l'applicazione su Windows, utilizza il file `start.bat` presente nella cartella principale del progetto. Questo file eseguirà automaticamente i comandi necessari per avviare sia il backend che il frontend. Assicurati di avere installato tutte le dipendenze richieste e che i percorsi nei file di configurazione siano corretti.
