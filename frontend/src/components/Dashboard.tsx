@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Mutuo } from '../types'
 import { formatCurrency, formatPercent, punteggioColor, punteggioBgColor, tipoTassoBadgeClass, tipoTassoLabel } from '../utils/format'
-import { TrendingUp, Eye, Trash2, Trophy, Printer, Settings, Check } from 'lucide-react'
+import { TrendingUp, Eye, Trash2, Trophy, Printer, Settings, Check, Download, Upload } from 'lucide-react'
 
 interface Props {
   mutui: Mutuo[]
@@ -12,9 +12,11 @@ interface Props {
   onPrint: () => void
   eurirs30y: number | null
   onSaveEurirs: (value: number) => void
+  onExport: () => void
+  onImport: (file: File) => void
 }
 
-export default function Dashboard({ mutui, onView, onDelete, selectedIds, onToggleSelect, onPrint, eurirs30y, onSaveEurirs }: Props) {
+export default function Dashboard({ mutui, onView, onDelete, selectedIds, onToggleSelect, onPrint, eurirs30y, onSaveEurirs, onExport, onImport }: Props) {
   const [eurirsInput, setEurirsInput] = useState(eurirs30y?.toString() ?? '')
   const [showEurirs, setShowEurirs] = useState(false)
 
@@ -25,7 +27,12 @@ export default function Dashboard({ mutui, onView, onDelete, selectedIds, onTogg
           <TrendingUp size={28} className="text-gray-400" />
         </div>
         <h2 className="text-lg font-semibold text-gray-700 mb-1">Nessun mutuo inserito</h2>
-        <p className="text-sm text-gray-500">Inizia aggiungendo le offerte delle banche che stai valutando</p>
+        <p className="text-sm text-gray-500 mb-4">Inizia aggiungendo le offerte delle banche che stai valutando</p>
+        <label className="btn-primary inline-flex items-center gap-2 cursor-pointer">
+          <Upload size={16} />
+          Importa dati
+          <input type="file" accept=".json" className="hidden" onChange={(e) => { if (e.target.files?.[0]) onImport(e.target.files[0]); e.target.value = '' }} />
+        </label>
       </div>
     )
   }
@@ -124,6 +131,22 @@ export default function Dashboard({ mutui, onView, onDelete, selectedIds, onTogg
                 {selectedIds.length} selezionati
               </span>
             )}
+            <button
+              onClick={onExport}
+              className="btn-secondary flex items-center gap-1.5 !py-2 !px-3 text-xs sm:text-sm no-print"
+              title="Esporta dati"
+            >
+              <Download size={16} />
+              <span className="hidden sm:inline">Esporta</span>
+            </button>
+            <label
+              className="btn-secondary flex items-center gap-1.5 !py-2 !px-3 text-xs sm:text-sm no-print cursor-pointer"
+              title="Importa dati"
+            >
+              <Upload size={16} />
+              <span className="hidden sm:inline">Importa</span>
+              <input type="file" accept=".json" className="hidden" onChange={(e) => { if (e.target.files?.[0]) onImport(e.target.files[0]); e.target.value = '' }} />
+            </label>
             <button
               onClick={onPrint}
               className="btn-secondary flex items-center gap-1.5 sm:gap-2 !py-2 !px-3 sm:!px-5 text-xs sm:text-sm no-print"

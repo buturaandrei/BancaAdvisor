@@ -55,4 +55,9 @@ export const api = {
   getEurirs: () => request<{ eurirs_30y: number | null }>('/settings/eurirs'),
   setEurirs: (value: number) =>
     request<{ eurirs_30y: number }>('/settings/eurirs', { method: 'PUT', body: JSON.stringify({ eurirs_30y: value }) }),
+
+  // Export/Import
+  esportaDati: () => request<{ mutui: import('../types').Mutuo[]; settings: Record<string, string> }>('/mutui/export/all'),
+  importaDati: (data: { mutui: import('../types').Mutuo[]; settings: Record<string, string> }) =>
+    request<{ importati: number }>('/mutui/import/all', { method: 'POST', body: JSON.stringify(data) }),
 }

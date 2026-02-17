@@ -59,6 +59,38 @@ export default function App() {
     }
   }
 
+  async function handleExport() {
+    try {
+      const data = await api.esportaDati()
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `bancadvisor-export-${new Date().toISOString().slice(0, 10)}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Errore nell\'export')
+    }
+  }
+
+  async function handleImport(file: File) {
+    try {
+      const text = await file.text()
+      const data = JSON.parse(text)
+      if (!data.mutui || !Array.isArray(data.mutui)) {
+        alert('File non valido: deve contenere un array "mutui"')
+        return
+      }
+      const result = await api.importaDati(data)
+      alert(`Importati ${result.importati} mutui con successo!`)
+      await loadMutui()
+      await loadEurirs()
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Errore nell\'import')
+    }
+  }
+
   useEffect(() => {
     loadMutui()
     checkAdvisor()
@@ -119,6 +151,8 @@ export default function App() {
           onPrint={handlePrint}
           eurirs30y={eurirs30y}
           onSaveEurirs={handleSaveEurirs}
+          onExport={handleExport}
+          onImport={handleImport}
         />
       )}
       {view === 'nuovo' && (
