@@ -6,6 +6,8 @@ colorTo: blue
 sdk: docker
 app_port: 7860
 pinned: false
+fullWidth: true
+header: mini
 ---
 
 # BancaAdvisor — Consulente Mutui con AI
