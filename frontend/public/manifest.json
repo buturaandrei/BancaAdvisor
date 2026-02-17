@@ -1,0 +1,26 @@
+{
+  "name": "BancaAdvisor — Consulente Mutui AI",
+  "short_name": "BancaAdvisor",
+  "description": "Confronta mutui, analizza offerte e ricevi consulenza AI per scegliere il mutuo migliore.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "categories": ["finance", "utilities"],
+  "lang": "it",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
