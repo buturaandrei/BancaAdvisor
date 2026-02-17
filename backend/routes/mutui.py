@@ -67,6 +67,70 @@ async def lista_mutui(db=Depends(get_db)):
     return [dict(r) for r in rows]
 
 
+@router.get("/export/all")
+async def esporta_dati(db=Depends(get_db)):
+    """Esporta tutti i mutui e le impostazioni come JSON."""
+    cursor = await db.execute("SELECT * FROM mutui ORDER BY id")
+    mutui = [dict(r) for r in await cursor.fetchall()]
+    cursor = await db.execute("SELECT * FROM settings")
+    settings = {r["key"]: r["value"] for r in await cursor.fetchall()}
+    return JSONResponse({"mutui": mutui, "settings": settings})
+
+
+@router.post("/import/all")
+async def importa_dati(data: dict, db=Depends(get_db)):
+    """Importa mutui e impostazioni da JSON esportato."""
+    mutui = data.get("mutui", [])
+    settings = data.get("settings", {})
+    count = 0
+    for m in mutui:
+        m.pop("id", None)
+        m.pop("created_at", None)
+        m.pop("updated_at", None)
+        cols = [k for k in m.keys()]
+        placeholders = ", ".join(f":{k}" for k in cols)
+        col_names = ", ".join(cols)
+        await db.execute(f"INSERT INTO mutui ({col_names}) VALUES ({placeholders})", m)
+        count += 1
+    for key, value in settings.items():
+        await db.execute(
+            """INSERT INTO settings (key, value, updated_at)
+               VALUES (:key, :val, CURRENT_TIMESTAMP)
+               ON CONFLICT(key) DO UPDATE SET value=:val, updated_at=CURRENT_TIMESTAMP""",
+            {"key": key, "val": value},
+        )
+    await db.commit()
+    return {"importati": count}
+
+
+@router.post("/ricalcola", status_code=200)
+async def ricalcola_punteggi(db=Depends(get_db)):
+    """Ricalcola rata, interessi, costo totale e punteggio per tutti i mutui."""
+    cursor = await db.execute("SELECT * FROM mutui")
+    rows = await cursor.fetchall()
+    count = 0
+    for row in rows:
+        m = dict(row)
+        m["rata_mensile"] = calcola_rata_mensile(m["importo"], m["tan"], m["durata_anni"])
+        m["ltv"] = calcola_ltv(m["importo"], m["valore_immobile"])
+        m["totale_interessi"] = calcola_totale_interessi(m["importo"], m["tan"], m["durata_anni"])
+        m["costo_totale"] = calcola_costo_totale(
+            m["importo"], m["tan"], m["durata_anni"],
+            m["spese_istruttoria"], m["spese_perizia"],
+            m["costo_assicurazione"], m["spese_notarili"], m["altre_spese"],
+        )
+        m["punteggio"] = calcola_punteggio(m)
+        await db.execute(
+            """UPDATE mutui SET rata_mensile=:rata_mensile, ltv=:ltv,
+               totale_interessi=:totale_interessi, costo_totale=:costo_totale,
+               punteggio=:punteggio WHERE id=:id""",
+            m,
+        )
+        count += 1
+    await db.commit()
+    return {"ricalcolati": count}
+
+
 @router.get("/{mutuo_id}", response_model=MutuoResponse)
 async def dettaglio_mutuo(mutuo_id: int, db=Depends(get_db)):
     cursor = await db.execute("SELECT * FROM mutui WHERE id = ?", (mutuo_id,))
@@ -157,42 +221,6 @@ async def ricalcola_punteggi(db=Depends(get_db)):
         count += 1
     await db.commit()
     return {"ricalcolati": count}
-
-
-@router.get("/export/all")
-async def esporta_dati(db=Depends(get_db)):
-    """Esporta tutti i mutui e le impostazioni come JSON."""
-    cursor = await db.execute("SELECT * FROM mutui ORDER BY id")
-    mutui = [dict(r) for r in await cursor.fetchall()]
-    cursor = await db.execute("SELECT * FROM settings")
-    settings = {r["key"]: r["value"] for r in await cursor.fetchall()}
-    return JSONResponse({"mutui": mutui, "settings": settings})
-
-
-@router.post("/import/all")
-async def importa_dati(data: dict, db=Depends(get_db)):
-    """Importa mutui e impostazioni da JSON esportato."""
-    mutui = data.get("mutui", [])
-    settings = data.get("settings", {})
-    count = 0
-    for m in mutui:
-        m.pop("id", None)
-        m.pop("created_at", None)
-        m.pop("updated_at", None)
-        cols = [k for k in m.keys()]
-        placeholders = ", ".join(f":{k}" for k in cols)
-        col_names = ", ".join(cols)
-        await db.execute(f"INSERT INTO mutui ({col_names}) VALUES ({placeholders})", m)
-        count += 1
-    for key, value in settings.items():
-        await db.execute(
-            """INSERT INTO settings (key, value, updated_at)
-               VALUES (:key, :val, CURRENT_TIMESTAMP)
-               ON CONFLICT(key) DO UPDATE SET value=:val, updated_at=CURRENT_TIMESTAMP""",
-            {"key": key, "val": value},
-        )
-    await db.commit()
-    return {"importati": count}
 
 
 @router.get("/{mutuo_id}/ammortamento")
