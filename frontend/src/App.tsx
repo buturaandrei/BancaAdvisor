@@ -27,7 +27,31 @@ export default function App() {
   const loadMutui = useCallback(async () => {
     try {
       const data = await api.listaMutui()
-      setMutui(data)
+      if (data.length > 0) {
+        setMutui(data)
+        // Auto-backup to localStorage
+        try {
+          const exportData = await api.esportaDati()
+          localStorage.setItem('bancadvisor-backup', JSON.stringify(exportData))
+        } catch { /* ignore backup errors */ }
+      } else {
+        // Server empty — try auto-restore from localStorage
+        const backup = localStorage.getItem('bancadvisor-backup')
+        if (backup) {
+          try {
+            const parsed = JSON.parse(backup)
+            if (parsed.mutui?.length > 0) {
+              const result = await api.importaDati(parsed)
+              if (result.importati > 0) {
+                const restored = await api.listaMutui()
+                setMutui(restored)
+                return
+              }
+            }
+          } catch { /* ignore restore errors */ }
+        }
+        setMutui(data)
+      }
     } catch {
       // handled by empty state
     }
