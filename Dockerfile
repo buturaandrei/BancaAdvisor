@@ -20,9 +20,14 @@ COPY backend/ ./
 COPY --from=frontend-build /app/frontend/dist ./frontend-dist
 
 RUN chown -R user:user /app
+
+# Persistent storage for HF Spaces
+RUN mkdir -p /data && chown user:user /data
+
 USER user
 
 ENV FRONTEND_DIST=/app/frontend-dist
+ENV DB_DIR=/data
 
 EXPOSE 7860
 
