@@ -6,6 +6,8 @@ import { parseMutuoText } from '../utils/parser'
 interface Props {
   onSubmit: (data: MutuoFormType) => Promise<void>
   loading: boolean
+  initialData?: MutuoFormType
+  editMode?: boolean
 }
 
 const defaultForm: MutuoFormType = {
@@ -25,8 +27,8 @@ const defaultForm: MutuoFormType = {
   note: '',
 }
 
-export default function MutuoForm({ onSubmit, loading }: Props) {
-  const [form, setForm] = useState<MutuoFormType>({ ...defaultForm })
+export default function MutuoForm({ onSubmit, loading, initialData, editMode }: Props) {
+  const [form, setForm] = useState<MutuoFormType>(initialData ? { ...initialData } : { ...defaultForm })
   const [importOpen, setImportOpen] = useState(false)
   const [pasteText, setPasteText] = useState('')
   const [parseResult, setParseResult] = useState<{ campiTrovati: string[]; noteParts: string[] } | null>(null)
@@ -361,7 +363,7 @@ export default function MutuoForm({ onSubmit, loading }: Props) {
       <div className="flex gap-3">
         <button type="submit" disabled={loading} className="btn-primary flex items-center gap-2">
           <Save size={18} />
-          {loading ? 'Salvataggio...' : 'Salva Mutuo'}
+          {loading ? 'Salvataggio...' : editMode ? 'Aggiorna Mutuo' : 'Salva Mutuo'}
         </button>
         <button
           type="button"

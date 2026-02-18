@@ -14,6 +14,7 @@ export default function App() {
   const [mutui, setMutui] = useState<Mutuo[]>([])
   const [selectedIds, setSelectedIds] = useState<number[]>([])
   const [detailId, setDetailId] = useState<number | null>(null)
+  const [editId, setEditId] = useState<number | null>(null)
   const [advisorStatus, setAdvisorStatus] = useState<AdvisorStatus | null>(null)
   const [formLoading, setFormLoading] = useState(false)
   const [eurirs30y, setEurirs30y] = useState<number | null>(null)
@@ -142,9 +143,31 @@ export default function App() {
     setView('dettaglio')
   }
 
+  function handleEditMutuo(id: number) {
+    setEditId(id)
+    setView('modifica')
+  }
+
+  async function handleUpdateMutuo(data: MutuoFormType) {
+    if (!editId) return
+    setFormLoading(true)
+    try {
+      await api.aggiornaMutuo(editId, data)
+      await loadMutui()
+      setEditId(null)
+      setView('dashboard')
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Errore nell\'aggiornamento')
+      throw e
+    } finally {
+      setFormLoading(false)
+    }
+  }
+
   function handleNavigate(newView: ViewMode) {
     setView(newView)
     if (newView !== 'dettaglio') setDetailId(null)
+    if (newView !== 'modifica') setEditId(null)
   }
 
   return (
@@ -154,6 +177,7 @@ export default function App() {
         <Dashboard
           mutui={mutui}
           onView={handleViewDetail}
+          onEdit={handleEditMutuo}
           onDelete={handleDeleteMutuo}
           selectedIds={selectedIds}
           onToggleSelect={handleToggleSelect}
@@ -168,6 +192,27 @@ export default function App() {
       {view === 'nuovo' && (
         <MutuoForm onSubmit={handleCreateMutuo} loading={formLoading} />
       )}
+      {view === 'modifica' && editId && (() => {
+        const m = mutui.find(x => x.id === editId)
+        if (!m) return null
+        const formData: MutuoFormType = {
+          banca: m.banca,
+          tipo_tasso: m.tipo_tasso,
+          tan: m.tan,
+          taeg: m.taeg ?? undefined,
+          spread: m.spread ?? undefined,
+          importo: m.importo,
+          valore_immobile: m.valore_immobile,
+          durata_anni: m.durata_anni,
+          spese_istruttoria: m.spese_istruttoria,
+          spese_perizia: m.spese_perizia,
+          costo_assicurazione: m.costo_assicurazione,
+          spese_notarili: m.spese_notarili,
+          altre_spese: m.altre_spese,
+          note: m.note ?? '',
+        }
+        return <MutuoForm key={editId} onSubmit={handleUpdateMutuo} loading={formLoading} initialData={formData} editMode />
+      })()}
       {view === 'confronto' && (
         <ComparisonView selectedIds={selectedIds} mutui={mutui} />
       )}
@@ -182,6 +227,7 @@ export default function App() {
         <MutuoDetail
           mutuoId={detailId}
           onBack={() => handleNavigate('dashboard')}
+          onEdit={handleEditMutuo}
         />
       )}
     </Layout>

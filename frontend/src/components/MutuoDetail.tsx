@@ -2,15 +2,16 @@ import { useState, useEffect } from 'react'
 import { api } from '../api/client'
 import type { Mutuo, AmortizationRow } from '../types'
 import { formatCurrency, formatPercent, tipoTassoLabel, tipoTassoBadgeClass, punteggioColor, punteggioBgColor } from '../utils/format'
-import { ArrowLeft, BarChart3 } from 'lucide-react'
+import { ArrowLeft, BarChart3, Pencil } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts'
 
 interface Props {
   mutuoId: number
   onBack: () => void
+  onEdit: (id: number) => void
 }
 
-export default function MutuoDetail({ mutuoId, onBack }: Props) {
+export default function MutuoDetail({ mutuoId, onBack, onEdit }: Props) {
   const [mutuo, setMutuo] = useState<Mutuo | null>(null)
   const [piano, setPiano] = useState<AmortizationRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -61,10 +62,16 @@ export default function MutuoDetail({ mutuoId, onBack }: Props) {
 
   return (
     <div className="space-y-6">
-      <button onClick={onBack} className="flex items-center gap-2 text-sm text-gray-500 hover:text-primary-600 transition-colors">
-        <ArrowLeft size={16} />
-        Torna alla lista
-      </button>
+      <div className="flex items-center justify-between">
+        <button onClick={onBack} className="flex items-center gap-2 text-sm text-gray-500 hover:text-primary-600 transition-colors">
+          <ArrowLeft size={16} />
+          Torna alla lista
+        </button>
+        <button onClick={() => onEdit(mutuoId)} className="btn-secondary flex items-center gap-2 text-sm !py-2 !px-4">
+          <Pencil size={16} />
+          Modifica
+        </button>
+      </div>
 
       {/* Header */}
       <div className="card p-6">

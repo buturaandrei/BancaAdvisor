@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Mutuo } from '../types'
 import { formatCurrency, formatPercent, punteggioColor, punteggioBgColor, tipoTassoBadgeClass, tipoTassoLabel } from '../utils/format'
-import { TrendingUp, Eye, Trash2, Trophy, Printer, Settings, Check, Download, Upload, CheckCircle2 } from 'lucide-react'
+import { TrendingUp, Eye, Trash2, Trophy, Printer, Settings, Check, Download, Upload, CheckCircle2, Pencil } from 'lucide-react'
 
 interface Props {
   mutui: Mutuo[]
   onView: (id: number) => void
+  onEdit: (id: number) => void
   onDelete: (id: number) => void
   selectedIds: number[]
   onToggleSelect: (id: number) => void
@@ -17,7 +18,7 @@ interface Props {
   onImport: (file: File) => void
 }
 
-export default function Dashboard({ mutui, onView, onDelete, selectedIds, onToggleSelect, onToggleVerificato, onPrint, eurirs30y, onSaveEurirs, onExport, onImport }: Props) {
+export default function Dashboard({ mutui, onView, onEdit, onDelete, selectedIds, onToggleSelect, onToggleVerificato, onPrint, eurirs30y, onSaveEurirs, onExport, onImport }: Props) {
   const [eurirsInput, setEurirsInput] = useState(eurirs30y?.toString() ?? '')
   const [showEurirs, setShowEurirs] = useState(false)
 
@@ -231,6 +232,13 @@ export default function Dashboard({ mutui, onView, onDelete, selectedIds, onTogg
                   title={m.verificato ? 'Dati verificati' : 'Segna come verificato'}
                 >
                   <CheckCircle2 size={20} />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onEdit(m.id) }}
+                  className="p-2 sm:p-2 text-gray-400 hover:text-amber-500 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+                  title="Modifica"
+                >
+                  <Pencil size={18} />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); onView(m.id) }}

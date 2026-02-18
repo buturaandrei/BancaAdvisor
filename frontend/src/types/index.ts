@@ -81,4 +81,4 @@ export interface Consulenza {
   created_at: string
 }
 
-export type ViewMode = 'dashboard' | 'nuovo' | 'confronto' | 'advisor' | 'dettaglio'
+export type ViewMode = 'dashboard' | 'nuovo' | 'modifica' | 'confronto' | 'advisor' | 'dettaglio'
