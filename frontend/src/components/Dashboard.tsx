@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Mutuo } from '../types'
 import { formatCurrency, formatPercent, punteggioColor, punteggioBgColor, tipoTassoBadgeClass, tipoTassoLabel } from '../utils/format'
-import { TrendingUp, Eye, Trash2, Trophy, Printer, Settings, Check, Download, Upload } from 'lucide-react'
+import { TrendingUp, Eye, Trash2, Trophy, Printer, Settings, Check, Download, Upload, CheckCircle2 } from 'lucide-react'
 
 interface Props {
   mutui: Mutuo[]
@@ -9,6 +9,7 @@ interface Props {
   onDelete: (id: number) => void
   selectedIds: number[]
   onToggleSelect: (id: number) => void
+  onToggleVerificato: (id: number) => void
   onPrint: () => void
   eurirs30y: number | null
   onSaveEurirs: (value: number) => void
@@ -16,7 +17,7 @@ interface Props {
   onImport: (file: File) => void
 }
 
-export default function Dashboard({ mutui, onView, onDelete, selectedIds, onToggleSelect, onPrint, eurirs30y, onSaveEurirs, onExport, onImport }: Props) {
+export default function Dashboard({ mutui, onView, onDelete, selectedIds, onToggleSelect, onToggleVerificato, onPrint, eurirs30y, onSaveEurirs, onExport, onImport }: Props) {
   const [eurirsInput, setEurirsInput] = useState(eurirs30y?.toString() ?? '')
   const [showEurirs, setShowEurirs] = useState(false)
 
@@ -162,7 +163,11 @@ export default function Dashboard({ mutui, onView, onDelete, selectedIds, onTogg
         {mutui.map((m) => (
           <div
             key={m.id}
-            className={`card p-3 sm:p-5 cursor-pointer ${
+            className={`card p-3 sm:p-5 cursor-pointer transition-all ${
+              m.verificato
+                ? 'border-green-400 bg-green-50/30 ring-1 ring-green-200'
+                : ''
+            } ${
               selectedIds.includes(m.id) ? 'ring-2 ring-primary-400 border-primary-200' : ''
             }`}
             onClick={() => onToggleSelect(m.id)}
@@ -218,6 +223,15 @@ export default function Dashboard({ mutui, onView, onDelete, selectedIds, onTogg
                     <p className="text-[9px] sm:text-[10px] text-gray-500 uppercase">punti</p>
                   </div>
                 )}
+                <button
+                  onClick={(e) => { e.stopPropagation(); onToggleVerificato(m.id) }}
+                  className={`p-2 sm:p-2 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center ${
+                    m.verificato ? 'text-green-500 hover:text-green-700' : 'text-gray-300 hover:text-green-500'
+                  }`}
+                  title={m.verificato ? 'Dati verificati' : 'Segna come verificato'}
+                >
+                  <CheckCircle2 size={20} />
+                </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); onView(m.id) }}
                   className="p-2 sm:p-2 text-gray-400 hover:text-primary-600 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"

@@ -32,6 +32,8 @@ export const api = {
     request<import('../types').Mutuo>(`/mutui/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   eliminaMutuo: (id: number) =>
     request<void>(`/mutui/${id}`, { method: 'DELETE' }),
+  toggleVerificato: (id: number) =>
+    request<{ id: number; verificato: boolean }>(`/mutui/${id}/verificato`, { method: 'PATCH' }),
   pianoAmmortamento: (id: number) =>
     request<{ mutuo_id: number; piano: import('../types').AmortizationRow[] }>(`/mutui/${id}/ammortamento`),
 

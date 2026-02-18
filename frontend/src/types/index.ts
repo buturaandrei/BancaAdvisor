@@ -19,6 +19,7 @@ export interface Mutuo {
   costo_totale: number | null
   totale_interessi: number | null
   punteggio: number | null
+  verificato: boolean
   created_at: string
   updated_at: string
 }

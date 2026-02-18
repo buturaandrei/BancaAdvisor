@@ -122,6 +122,15 @@ export default function App() {
     }
   }
 
+  async function handleToggleVerificato(id: number) {
+    try {
+      const result = await api.toggleVerificato(id)
+      setMutui(prev => prev.map(m => m.id === id ? { ...m, verificato: result.verificato } : m))
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Errore nell\'aggiornamento')
+    }
+  }
+
   function handleToggleSelect(id: number) {
     setSelectedIds(prev =>
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
@@ -148,6 +157,7 @@ export default function App() {
           onDelete={handleDeleteMutuo}
           selectedIds={selectedIds}
           onToggleSelect={handleToggleSelect}
+          onToggleVerificato={handleToggleVerificato}
           onPrint={handlePrint}
           eurirs30y={eurirs30y}
           onSaveEurirs={handleSaveEurirs}

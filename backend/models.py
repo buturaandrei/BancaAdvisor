@@ -64,6 +64,7 @@ class MutuoResponse(BaseModel):
     costo_totale: Optional[float]
     totale_interessi: Optional[float]
     punteggio: Optional[float]
+    verificato: bool = False
     created_at: str
     updated_at: str
 

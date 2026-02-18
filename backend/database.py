@@ -43,6 +43,7 @@ async def init_db():
                 costo_totale REAL,
                 totale_interessi REAL,
                 punteggio REAL,
+                verificato INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
@@ -67,3 +68,10 @@ async def init_db():
         """)
 
         await db.commit()
+
+        # Migrate: add verificato column if missing
+        cursor = await db.execute("PRAGMA table_info(mutui)")
+        cols = [row[1] for row in await cursor.fetchall()]
+        if "verificato" not in cols:
+            await db.execute("ALTER TABLE mutui ADD COLUMN verificato INTEGER DEFAULT 0")
+            await db.commit()

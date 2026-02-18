@@ -195,6 +195,18 @@ async def elimina_mutuo(mutuo_id: int, db=Depends(get_db)):
     await db.commit()
 
 
+@router.patch("/{mutuo_id}/verificato")
+async def toggle_verificato(mutuo_id: int, db=Depends(get_db)):
+    cursor = await db.execute("SELECT verificato FROM mutui WHERE id = ?", (mutuo_id,))
+    row = await cursor.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Mutuo non trovato")
+    new_val = 0 if row["verificato"] else 1
+    await db.execute("UPDATE mutui SET verificato = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?", (new_val, mutuo_id))
+    await db.commit()
+    return {"id": mutuo_id, "verificato": bool(new_val)}
+
+
 @router.post("/ricalcola", status_code=200)
 async def ricalcola_punteggi(db=Depends(get_db)):
     """Ricalcola rata, interessi, costo totale e punteggio per tutti i mutui."""
