@@ -2,7 +2,7 @@ import httpx
 import json
 
 OLLAMA_BASE_URL = "http://localhost:11434"
-MODEL_NAME = "gemma2:2b"
+MODEL_NAME = "gemma3:12b"
 
 
 async def chiedi_consulenza(mutui_data: list[dict], domanda: str | None = None) -> str:
@@ -138,7 +138,7 @@ async def chiedi_consulenza(mutui_data: list[dict], domanda: str | None = None) 
         return (
             "\u26a0\ufe0f Impossibile connettersi a Ollama. "
             "Assicurati che Ollama sia in esecuzione (ollama serve) "
-            "e che il modello gemma2:2b sia installato (ollama pull gemma2:2b)."
+            "e che il modello gemma3:12b sia installato (ollama pull gemma3:12b)."
         )
     except httpx.HTTPStatusError as e:
         return f"\u26a0\ufe0f Errore dal server Ollama: {e.response.status_code}"

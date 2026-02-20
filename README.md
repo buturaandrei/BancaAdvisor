@@ -1,6 +1,6 @@
 # BancaAdvisor — Consulente Mutui con AI
 
-Un'applicazione completa per gestire, confrontare e analizzare offerte di mutuo da diverse banche, con un consulente AI integrato basato su **Gemma 2B** (via Ollama).
+Un'applicazione completa per gestire, confrontare e analizzare offerte di mutuo da diverse banche, con un consulente AI integrato basato su **Gemma 3 12B** (via Ollama).
 
 ## Architettura
 
@@ -11,7 +11,7 @@ BancaAdvisor/
 │   ├── database.py       # SQLite async database
 │   ├── models.py         # Pydantic schemas
 │   ├── mortgage_engine.py # Motore di calcolo mutui
-│   ├── ollama_advisor.py # Integrazione Gemma 2B
+│   ├── ollama_advisor.py # Integrazione Gemma 3 12B
 │   └── routes/           # API routes
 │       ├── mutui.py      # CRUD mutui
 │       ├── confronto.py  # Confronto mutui
@@ -30,7 +30,7 @@ BancaAdvisor/
 - **Smart Import**: Incolla testo da siti bancari, i dati vengono estratti automaticamente
 - **Calcolo Automatico**: Rata mensile, piano ammortamento, costo totale, LTV, punteggio
 - **Confronto**: Confronto side-by-side con grafici radar, barre e tabelle
-- **AI Advisor**: Consulenza finanziaria da Gemma 2B via Ollama con analisi per scenari
+- **AI Advisor**: Consulenza finanziaria da Gemma 3 12B via Ollama con analisi per scenari
 - **Eurirs/Spread**: Inserisci l'Eurirs 30Y e lo spread viene calcolato per ogni mutuo fisso
 - **Punteggio**: Sistema di scoring 0-100 per classificare le offerte
 - **Stampa Report**: Report PDF comparativo stampabile
@@ -40,7 +40,7 @@ BancaAdvisor/
 
 - **Python 3.11+**
 - **Node.js 18+**
-- **Ollama** con modello `gemma2:2b`
+- **Ollama** con modello `gemma3:12b`
 
 ## Setup Rapido
 
@@ -48,7 +48,7 @@ BancaAdvisor/
 
 ```bash
 # Installa Ollama da https://ollama.com
-ollama pull gemma2:2b
+ollama pull gemma3:12b
 ollama serve    # Deve rimanere attivo
 ```
 
@@ -105,7 +105,7 @@ Il punteggio (0-100) considera:
 
 - **Backend**: Python, FastAPI, aiosqlite, httpx
 - **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, Recharts, Lucide Icons
-- **AI**: Ollama + Gemma 2B
+- **AI**: Ollama + Gemma 3 12B
 - **Database**: SQLite (WAL mode)
 
 ## Avvio Rapido su Windows
