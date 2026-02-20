@@ -26,7 +26,7 @@ if [ -d "$APP_DIR" ]; then
     git pull
 else
     echo ">> Clonazione repo..."
-    git clone https://github.com/buturaandrei/BancaAdvisor.git "$APP_DIR"
+    git clone https://github.com/YOUR_USERNAME/BancaAdvisor.git "$APP_DIR"
     cd "$APP_DIR"
 fi
 
